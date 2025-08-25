@@ -26,11 +26,12 @@ public:
 		if(damage<0) damage=0;
 		
 		hp-=damage;
-		cout<<name<<" taked "<<damage<<" damage!!\n";
+		cout<<"-> "<<name<<" taked "<<damage<<" damage!!\n";
 	}
 	void attackTarget(Character& target){
 		cout<<name<<" attack "<<target.name<<"...\n";
-		target.takeDamage(attack);
+		int atk=attack*(rand()%4)/10+attack;
+		target.takeDamage(atk);
 	}
 	
 	virtual void showStatus()=0;
@@ -57,14 +58,14 @@ public:
 	void levelUp(int e){
 		exp+=e;
 		if(exp>=maxExp){
-			cout<<" ### LEVEL UP "<<level<<"->"<<level+1<<" ###\n";
+			cout<<"\n ### LEVEL UP "<<level<<"->"<<level+1<<" ###\n";
 			level++;
 			exp-=maxExp;
 			maxExp+=maxExp/10;
-			hp+=hp/10;
-			maxHp+=maxHp/15;
-			attack+=attack/15;
-			defense+=defense/15;
+			hp+=hp/5;
+			maxHp+=maxHp/5;
+			attack+=attack/5;
+			defense+=defense/5;
 		}
 	}
 	void upgradeWeapon(){weaponLevel++; attack+=5;}
@@ -164,66 +165,146 @@ void battle(Player& p, Monster& m){
         cout << "You were defeated...\n";
     } else if (m.isDead()) {
         cout << "You defeated " << m.getName() << "!\n";
-        p.levelUp(m.getLevel()*10);
+        p.levelUp(m.getLevel()*20);
 		p.adjustGold(m.getGold());
     }
 }
 
-Monster spawner(int m){
-	string name[]={"Slime", "Treeknight", "Mushroom"};
-	int index = rand() % 3;
-
-    if (index == 0)
-        return Monster(name[index], 5, 1, 1,1,1);
-    else if (index == 1)
-        return Monster(name[index], 7, 2, 1,5,2);
-    else
-        return Monster(name[index], 10,3,2,10,3);
-}
-
-void greenForest(Player& p){
-	resurrectionTime--;
-	Monster m=spawner(1);
-	battle(p,m);
+Monster spawner(int region){
+	
+	int index = rand() % 5;
+	
+	if(region==1){
+		if (index == 0)
+			return Monster("Slime", 5, 5, 1,1,1);
+		else if (index == 1)
+			return Monster("Mushroom", 7, 5, 1,5,2);
+		else if (index == 2)
+			return Monster("Tree", 10,5,2,10,3);
+		else if (index == 3)
+			return Monster("Monkey", 15,6,2,20,4);
+		else
+			return Monster("Tiger", 20,6,3,30,5);
+	}
+	else if(region==2){
+		if (index == 0)
+			return Monster("Bat", 12, 6, 2,25,5);
+		else if (index == 1)
+			return Monster("Rat", 15, 4, 2,25,5);
+		else if (index == 2)
+			return Monster("Ghost", 20,8,5,35,6);
+		else if (index == 3)
+			return Monster("Qute Bear", 30,10,7,40,7);
+		else
+			return Monster("Golem", 45,9,10,45,8);
+	}
+	else if(region==3){
+		if (index == 0)
+			return Monster("Goat", 25, 8, 5,40,8);
+		else if (index == 1)
+			return Monster("Eagle", 25, 12, 5,45,9);
+		else if (index == 2)
+			return Monster("Mountain Spirit", 30,14,7,50,10);
+		else if (index == 3)
+			return Monster("Hog", 40,15,8,55,11);
+		else
+			return Monster("Gorila", 50,17,15,60,12);
+	}
+	else if(region==4){
+		if (index == 0)
+			return Monster("Ghost Knight", 50, 15, 15,60,12);
+		else if (index == 1)
+			return Monster("Moving Castle", 100, 10, 20,80,13);
+		else if (index == 2)
+			return Monster("Dark Ghost", 70,18,15,80,14);
+		else if (index == 3)
+			return Monster("Dark Golem", 150,20,20,90,15);
+		else
+			return Monster("Ghost King", 90,25,15,100,16);
+	}
+	else{
+		if (index == 0)
+			return Monster("Imp", 70, 20, 15,90,16);
+		else if (index == 1)
+			return Monster("Demon", 100, 25, 20,100,17);
+		else if (index == 2)
+			return Monster("Magma Golem", 200,30,30,110,18);
+		else if (index == 3)
+			return Monster("Demon of Fire", 150,35,25,120,19);
+		else
+			return Monster("Dragon", 250,40,40,150,20);
+	}
 }
 
 void hunting(Player& p){
 	cout<<"\n*****************HUNTING SPOT*******************\n\n";
 	cout<<"       (1) Green Forest        (1Lv ~ 5Lv)\n";
-	cout<<"       (2) Dark Cave           (4Lv ~ 9Lv)\n";
-	cout<<"       (3) High Mountain       (8Lv ~ 13Lv)\n";
-	cout<<"       (4) Fallen Kindom       (12Lv ~ 17Lv)\n";
+	cout<<"       (2) Dark Cave           (4Lv ~ 8Lv)\n";
+	cout<<"       (3) High Mountain       (8Lv ~ 12Lv)\n";
+	cout<<"       (4) Fallen Kindom       (12Lv ~ 16Lv)\n";
 	cout<<"       (5) Castle of DemonKing (16Lv ~ 20Lv)\n";
 	cout<<"\nHP: "<<p.getHp()<<"/"<<p.getMaxHp()<<"   Lv"<<p.getLevel()<<" ("<<p.getExpPersent()<<"%)\n";
 	cout<<">>";
 	int choice;
 	cin>>choice;
 	
-	if(choice==1)
-		greenForest(p);
+	if(choice==1){
+		resurrectionTime--;
+		Monster m=spawner(1);
+		battle(p,m);
+	}
+	else if(choice==2){
+		resurrectionTime--;
+		Monster m=spawner(2);
+		battle(p,m);
+	}
+	else if(choice==3){
+		resurrectionTime--;
+		Monster m=spawner(3);
+		battle(p,m);
+	}
+	if(choice==4){
+		resurrectionTime--;
+		Monster m=spawner(4);
+		battle(p,m);
+	}
+	if(choice==5){
+		resurrectionTime--;
+		Monster m=spawner(5);
+		battle(p,m);
+	}
 }
 
 int main() {
-    string t;
-	cout<<"welcome! Enter your name!\n"<<">> ";
-	getline(cin,t);
-	Player player(t,10,5,5,100,1);
 	
-	int tmp;
 	while(true){
-		cout<<"\n| MAIN |          Ressurect of DemonKing...D-"<<resurrectionTime<<"\n";
-		player.showStatus();
-		showOption();
-		cout<<">> ";
-		cin>>tmp;
+    	string t;
+		cout<<"welcome! Enter your name!\n"<<">> ";
+		getline(cin,t);
+		Player player(t,10,5,5,100,1);
+		resurrectionTime=50;
+		
+		int tmp;
+		while(true){
+			if(player.isDead()){
+				cout<<player.getName()<<" is Dead...\n\n";
+				break;
+			}
+			
+			cout<<"\n| MAIN |          Ressurect of DemonKing...D-"<<resurrectionTime<<"\n";
+			player.showStatus();
+			showOption();
+			cout<<">> ";
+			cin>>tmp;
+			cin.ignore();
 	
-		if(tmp==1)
-			showBlackSmith(player);
-		if(tmp==2)
-			doSleep(player);
-		if(tmp==3)
-			hunting(player);
+			if(tmp==1)
+				showBlackSmith(player);
+			if(tmp==2)
+				doSleep(player);
+			if(tmp==3)
+				hunting(player);
+		}
 	}
-	
     return 0;
 }
