@@ -30,7 +30,7 @@ public:
 	}
 	void attackTarget(Character& target){
 		cout<<name<<" attack "<<target.name<<"...\n";
-		int atk=attack*(rand()%4)/10+attack;
+		int atk = attack + (attack * (rand() % 41) / 100);
 		target.takeDamage(atk);
 	}
 	
@@ -51,25 +51,45 @@ public:
 	int getExpPersent(){return exp*100/maxExp;}
 	void adjustGold(int g){gold+=g;}
 	void recoverHp(){
-		hp+=hp/2;
+		hp+=maxHp/2;
 		if(hp>=maxHp)
 			hp=maxHp;
 	}
 	void levelUp(int e){
 		exp+=e;
-		if(exp>=maxExp){
+		while (exp >= maxExp) {
 			cout<<"\n ### LEVEL UP "<<level<<"->"<<level+1<<" ###\n";
 			level++;
-			exp-=maxExp;
-			maxExp+=maxExp/10;
-			hp+=hp/5;
-			maxHp+=maxHp/5;
-			attack+=attack/5;
-			defense+=defense/5;
+			exp -= maxExp;
+			maxExp += maxExp / 10;
+			hp += hp / 5;
+			maxHp += maxHp / 5;
+			attack += attack / 5;
+			defense += defense / 5;
 		}
 	}
-	void upgradeWeapon(){weaponLevel++; attack+=5;}
-	void upgradeArmor(){armorLevel++; defense+=5;}
+	void upgradeWeapon(){
+		int r=rand()%100+1;
+		if(r>weaponLevel*5){
+			weaponLevel++;
+			attack+=5;
+			cout<<" Weapon upgrade success!!!\n";
+		}
+		else{
+			cout<<" Weapon upgrade fail...\n";
+		}
+	}
+	void upgradeArmor(){
+		int r=rand()%100+1;
+		if(r>armorLevel*5){
+			armorLevel++;
+			defense+=5;
+			cout<<" Armor upgrade success!!!\n";
+		}
+		else{
+			cout<<" Armor upgrade fail...\n";
+		}
+	}
 	virtual void showStatus(){
 		cout<<"====================STATUS=====================\n";
 		cout<<"          NAME    : "<<name<<'\n';
@@ -143,7 +163,8 @@ void battle(Player& p, Monster& m){
 	while(!p.isDead()&&!m.isDead()){
 		m.showStatus();
 		cout<<endl;
-	
+		cout<<"      "<<p.getName()<<" (Lv"<<p.getLevel()<<")\n";
+		cout<<"      "<<p.getHp()<<"/"<<p.getMaxHp()<<"\n\n";
 		cout<<"   (1) Attack\n";
 		cout<<"   (2) Run\n";
 		int choice;
@@ -176,63 +197,63 @@ Monster spawner(int region){
 	
 	if(region==1){
 		if (index == 0)
-			return Monster("Slime", 5, 5, 1,1,1);
+			return Monster("Slime", 7, 6, 1,1,1);
 		else if (index == 1)
-			return Monster("Mushroom", 7, 5, 1,5,2);
+			return Monster("Mushroom", 7, 7, 1,5,2);
 		else if (index == 2)
-			return Monster("Tree", 10,5,2,10,3);
+			return Monster("Tree", 10,9,2,10,3);
 		else if (index == 3)
-			return Monster("Monkey", 15,6,2,20,4);
+			return Monster("Monkey", 15,9,2,20,4);
 		else
-			return Monster("Tiger", 20,6,3,30,5);
+			return Monster("Tiger", 20,10,3,30,5);
 	}
 	else if(region==2){
 		if (index == 0)
-			return Monster("Bat", 12, 6, 2,25,5);
+			return Monster("Bat", 12, 9, 2,25,5);
 		else if (index == 1)
-			return Monster("Rat", 15, 4, 2,25,5);
+			return Monster("Rat", 15, 9, 2,25,5);
 		else if (index == 2)
-			return Monster("Ghost", 20,8,5,35,6);
+			return Monster("Ghost", 20,10,5,35,6);
 		else if (index == 3)
-			return Monster("Qute Bear", 30,10,7,40,7);
+			return Monster("Quty Bear", 30,15,7,40,7);
 		else
-			return Monster("Golem", 45,9,10,45,8);
+			return Monster("Golem", 50,15,10,45,8);
 	}
 	else if(region==3){
 		if (index == 0)
-			return Monster("Goat", 25, 8, 5,40,8);
+			return Monster("Goat", 25, 15, 8,40,8);
 		else if (index == 1)
-			return Monster("Eagle", 25, 12, 5,45,9);
+			return Monster("Eagle", 25, 17, 8,45,9);
 		else if (index == 2)
-			return Monster("Mountain Spirit", 30,14,7,50,10);
+			return Monster("Mountain Spirit", 30,18,10,50,10);
 		else if (index == 3)
-			return Monster("Hog", 40,15,8,55,11);
+			return Monster("Hog", 40,20,15,55,11);
 		else
-			return Monster("Gorila", 50,17,15,60,12);
+			return Monster("Gorila", 50,25,15,60,12);
 	}
 	else if(region==4){
 		if (index == 0)
-			return Monster("Ghost Knight", 50, 15, 15,60,12);
+			return Monster("Ghost Knight", 60, 20, 25,60,12);
 		else if (index == 1)
-			return Monster("Moving Castle", 100, 10, 20,80,13);
+			return Monster("Moving Castle", 100, 30, 30,80,13);
 		else if (index == 2)
-			return Monster("Dark Ghost", 70,18,15,80,14);
+			return Monster("Dark Ghost", 80,35,25,80,14);
 		else if (index == 3)
-			return Monster("Dark Golem", 150,20,20,90,15);
+			return Monster("Dark Golem", 150,40,40,90,15);
 		else
-			return Monster("Ghost King", 90,25,15,100,16);
+			return Monster("Ghost King", 90,50,35,100,16);
 	}
 	else{
 		if (index == 0)
-			return Monster("Imp", 70, 20, 15,90,16);
+			return Monster("Imp", 110, 40, 35,90,16);
 		else if (index == 1)
-			return Monster("Demon", 100, 25, 20,100,17);
+			return Monster("Demon", 130, 50, 50,100,17);
 		else if (index == 2)
-			return Monster("Magma Golem", 200,30,30,110,18);
+			return Monster("Magma Golem", 250,65,100,110,18);
 		else if (index == 3)
-			return Monster("Demon of Fire", 150,35,25,120,19);
+			return Monster("Demon of Fire", 150,70,60,120,19);
 		else
-			return Monster("Dragon", 250,40,40,150,20);
+			return Monster("Dragon", 300,100,88,150,20);
 	}
 }
 
@@ -248,31 +269,18 @@ void hunting(Player& p){
 	int choice;
 	cin>>choice;
 	
-	if(choice==1){
-		resurrectionTime--;
-		Monster m=spawner(1);
-		battle(p,m);
+	switch(choice) {
+    case 1: case 2: case 3: case 4: case 5:
+        resurrectionTime--;
+        Monster m = spawner(choice);
+        battle(p, m);
+        break;
 	}
-	else if(choice==2){
-		resurrectionTime--;
-		Monster m=spawner(2);
-		battle(p,m);
-	}
-	else if(choice==3){
-		resurrectionTime--;
-		Monster m=spawner(3);
-		battle(p,m);
-	}
-	if(choice==4){
-		resurrectionTime--;
-		Monster m=spawner(4);
-		battle(p,m);
-	}
-	if(choice==5){
-		resurrectionTime--;
-		Monster m=spawner(5);
-		battle(p,m);
-	}
+}
+
+void finalBattle(Player& p){
+	Monster demonKing("DemonKing",1000,100,100,0,999);
+	battle(p,demonKing);
 }
 
 int main() {
@@ -281,7 +289,7 @@ int main() {
     	string t;
 		cout<<"welcome! Enter your name!\n"<<">> ";
 		getline(cin,t);
-		Player player(t,10,5,5,100,1);
+		Player player(t,10,5,5,10,1);
 		resurrectionTime=50;
 		
 		int tmp;
@@ -289,6 +297,17 @@ int main() {
 			if(player.isDead()){
 				cout<<player.getName()<<" is Dead...\n\n";
 				break;
+			}
+			if(resurrectionTime==0){
+				finalBattle(player);
+				if(player.isDead()){
+					cout<<player.getName()<<" is Dead...\n\n";
+					break;
+				}
+				else{
+					cout<<player.getName()<<" save the world!!!\n";
+					return 0;
+				}
 			}
 			
 			cout<<"\n| MAIN |          Ressurect of DemonKing...D-"<<resurrectionTime<<"\n";
