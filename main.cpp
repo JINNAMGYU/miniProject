@@ -37,6 +37,11 @@ public:
 	virtual void showStatus()=0;
 };
 
+const float STAT_GROWTH_RATE=0.2f;
+const float EXP_GROWTH_RATE=0.1f;
+const float UPGRADE_GOLD_RATE=5;
+const float UPGRADE_STAT_RATE=5;
+
 class Player : public Character {
 protected:
 	int weaponLevel=1;
@@ -61,18 +66,18 @@ public:
 			cout<<"\n ### LEVEL UP "<<level<<"->"<<level+1<<" ###\n";
 			level++;
 			exp -= maxExp;
-			maxExp += maxExp / 10;
-			hp += hp / 5;
-			maxHp += maxHp / 5;
-			attack += attack / 5;
-			defense += defense / 5;
+			maxExp += maxExp*EXP_GROWTH_RATE;
+			hp += hp * STAT_GROWTH_RATE;
+			maxHp += maxHp *STAT_GROWTH_RATE;
+			attack += attack * STAT_GROWTH_RATE;
+			defense += defense * STAT_GROWTH_RATE;
 		}
 	}
 	void upgradeWeapon(){
 		int r=rand()%100+1;
-		if(r>weaponLevel*5){
+		if(r>weaponLevel*UPGRADE_GOLD_RATE){
 			weaponLevel++;
-			attack+=5;
+			attack+=UPGRADE_STAT_RATE;
 			cout<<" Weapon upgrade success!!!\n";
 		}
 		else{
@@ -81,9 +86,9 @@ public:
 	}
 	void upgradeArmor(){
 		int r=rand()%100+1;
-		if(r>armorLevel*5){
+		if(r>armorLevel*UPGRADE_GOLD_RATE){
 			armorLevel++;
-			defense+=5;
+			defense+=UPGRADE_STAT_RATE;
 			cout<<" Armor upgrade success!!!\n";
 		}
 		else{
@@ -108,6 +113,9 @@ void showOption(){
 	cout<<"(3) Hunting\n";
 }
 
+
+const int UPGRADE_WEAPON_COST_RATE=7;
+const int UPGRADE_ARMOR_COST_RATE=7;
 void showBlackSmith(Player& p){
 	while(true){
 		cout<<"\n++++++++++++++++++BLACKSMITH+++++++++++++++++++\n";
@@ -120,17 +128,18 @@ void showBlackSmith(Player& p){
 		cout<<">> ";
 		cin>>opt;
 		
+		
 		if(opt==1){
-			if(p.getGold()>=5*p.getWeapon()){
-				p.adjustGold((-1)*5*p.getWeapon());
+			if(p.getGold()>=UPGRADE_WEAPON_COST_RATE*p.getWeapon()){
+				p.adjustGold((-1)*UPGRADE_WEAPON_COST_RATE*p.getWeapon());
 				p.upgradeWeapon();
 			}
 			else
 				cout<<"\nyou dont have enough gold!\n\n";
 		}
 		else if(opt==2){
-			if(p.getGold()>=5*p.getArmor()){
-				p.adjustGold((-1)*5*p.getArmor());
+			if(p.getGold()>=UPGRADE_ARMOR_COST_RATE*p.getArmor()){
+				p.adjustGold((-1)*UPGRADE_ARMOR_COST_RATE*p.getArmor());
 				p.upgradeArmor();
 			}
 			else
@@ -157,8 +166,51 @@ public:
 	}
 };
 
+struct MonsterData{
+	string name;
+	int hp,attack,defense,gold,level;
+};
+const MonsterData region1Monsters[]{
+	{"Slime", 7, 6, 1,1,1},
+	{"Mushroom", 7, 7, 1,5,2},
+	{"Tree", 10,9,2,10,3},
+	{"Monkey", 15,9,2,20,4},
+	{"Tiger", 20,10,3,30,5}
+};
+const MonsterData region2Monsters[]{
+	{"Bat", 12, 9, 2,25,5},
+	{"Rat", 15, 9, 2,25,5},
+	{"Ghost", 20,10,5,35,6},
+	{"Quty Bear", 30,15,7,40,7},
+	{"Golem", 50,15,10,45,8}
+};
+const MonsterData region3Monsters[]{
+	{"Goat", 25, 15, 8,40,8},
+	{"Eagle", 25, 17, 8,45,9},
+	{"Mountain Spirit", 30,18,10,50,10},
+	{"Hog", 40,20,15,55,11},
+	{"Gorila", 50,25,15,60,12}
+};
+const MonsterData region4Monsters[]{
+	{"Ghost Knight", 60, 20, 25,60,12},
+	{"Moving Castle", 100, 30, 30,80,13},
+	{"Dark Ghost", 80,35,25,80,14},
+	{"Dark Golem", 150,40,40,90,15},
+	{"Ghost King", 90,50,35,100,16}
+};
+const MonsterData region5Monsters[]{
+	{"Imp", 110, 40, 35,90,16},
+	{"Demon", 130, 50, 50,100,17},
+	{"Magma Golem", 250,65,100,110,18},
+	{"Demon of Fire", 150,70,60,120,19},
+	{"Dragon", 300,100,88,150,20}
+};
+const MonsterData* allMonsers[]={region1Monsters,region2Monsters,region3Monsters,region4Monsters,region4Monsters,region5Monsters};
+
+const int GET_EXP_RATE=20;
 void battle(Player& p, Monster& m){
 	cout<<"!!!!! "<<m.getName()<< " appear !!!!!\n";
+	
 	
 	while(!p.isDead()&&!m.isDead()){
 		m.showStatus();
@@ -186,75 +238,17 @@ void battle(Player& p, Monster& m){
         cout << "You were defeated...\n";
     } else if (m.isDead()) {
         cout << "You defeated " << m.getName() << "!\n";
-        p.levelUp(m.getLevel()*20);
+        p.levelUp(m.getLevel()*GET_EXP_RATE);
 		p.adjustGold(m.getGold());
     }
 }
 
+
 Monster spawner(int region){
 	
 	int index = rand() % 5;
-	
-	if(region==1){
-		if (index == 0)
-			return Monster("Slime", 7, 6, 1,1,1);
-		else if (index == 1)
-			return Monster("Mushroom", 7, 7, 1,5,2);
-		else if (index == 2)
-			return Monster("Tree", 10,9,2,10,3);
-		else if (index == 3)
-			return Monster("Monkey", 15,9,2,20,4);
-		else
-			return Monster("Tiger", 20,10,3,30,5);
-	}
-	else if(region==2){
-		if (index == 0)
-			return Monster("Bat", 12, 9, 2,25,5);
-		else if (index == 1)
-			return Monster("Rat", 15, 9, 2,25,5);
-		else if (index == 2)
-			return Monster("Ghost", 20,10,5,35,6);
-		else if (index == 3)
-			return Monster("Quty Bear", 30,15,7,40,7);
-		else
-			return Monster("Golem", 50,15,10,45,8);
-	}
-	else if(region==3){
-		if (index == 0)
-			return Monster("Goat", 25, 15, 8,40,8);
-		else if (index == 1)
-			return Monster("Eagle", 25, 17, 8,45,9);
-		else if (index == 2)
-			return Monster("Mountain Spirit", 30,18,10,50,10);
-		else if (index == 3)
-			return Monster("Hog", 40,20,15,55,11);
-		else
-			return Monster("Gorila", 50,25,15,60,12);
-	}
-	else if(region==4){
-		if (index == 0)
-			return Monster("Ghost Knight", 60, 20, 25,60,12);
-		else if (index == 1)
-			return Monster("Moving Castle", 100, 30, 30,80,13);
-		else if (index == 2)
-			return Monster("Dark Ghost", 80,35,25,80,14);
-		else if (index == 3)
-			return Monster("Dark Golem", 150,40,40,90,15);
-		else
-			return Monster("Ghost King", 90,50,35,100,16);
-	}
-	else{
-		if (index == 0)
-			return Monster("Imp", 110, 40, 35,90,16);
-		else if (index == 1)
-			return Monster("Demon", 130, 50, 50,100,17);
-		else if (index == 2)
-			return Monster("Magma Golem", 250,65,100,110,18);
-		else if (index == 3)
-			return Monster("Demon of Fire", 150,70,60,120,19);
-		else
-			return Monster("Dragon", 300,100,88,150,20);
-	}
+	const MonsterData* regionMonsters=allMonsers[region-1];
+	const MonsterData& data = regionMonsters[index];
 }
 
 void hunting(Player& p){
@@ -278,10 +272,21 @@ void hunting(Player& p){
 	}
 }
 
+const int DEMONKING_HP=1000;
+const int DEMONKING_ATTACK=300;
+const int DEMONKING_DEFENSE=300;
+const int DEMONKING_LEVEL=999;
+							 
 void finalBattle(Player& p){
-	Monster demonKing("DemonKing",1000,100,100,0,999);
+	Monster demonKing("DemonKing",DEMONKING_HP,DEMONKING_ATTACK,DEMONKING_DEFENSE,0,DEMONKING_LEVEL);
 	battle(p,demonKing);
 }
+							 
+const int PLAYER_BEGINING_HP=10;
+const int PLAYER_BEGINING_ATTACK=5;
+const int PLAYER_BEGINING_DEFENSE=5;
+const int PLAYER_BEGINING_GOLD=10;
+const int PLAYER_BEGINING_LEVEL=1;
 
 int main() {
 	
@@ -289,7 +294,7 @@ int main() {
     	string t;
 		cout<<"welcome! Enter your name!\n"<<">> ";
 		getline(cin,t);
-		Player player(t,10,5,5,10,1);
+		Player player(t,PLAYER_BEGINING_HP,PLAYER_BEGINING_ATTACK,PLAYER_BEGINING_DEFENSE,PLAYER_BEGINING_GOLD,PLAYER_BEGINING_LEVEL);
 		resurrectionTime=50;
 		
 		int tmp;
